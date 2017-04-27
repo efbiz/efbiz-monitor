@@ -1,0 +1,14 @@
+apply plugin:'application'
+mainClassName = "org.stagemonitor.os.OsPlugin"
+repositories {
+	flatDir { dirs 'lib/sigar' }
+}
+
+dependencies {
+	compile project(":stagemonitor-core")
+	compile 'org.fusesource:sigar:1.6.4'
+	// will be included in application distribution but not in maven pom
+	provided "org.slf4j:slf4j-simple:$slf4jVersion"
+
+	testCompile project(':stagemonitor-core').sourceSets.test.output
+}

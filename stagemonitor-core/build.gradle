@@ -1,0 +1,25 @@
+dependencies {
+	compile "org.slf4j:slf4j-api:$slf4jVersion"
+	compile "io.dropwizard.metrics:metrics-core:$metricsVersion"
+	compile "io.dropwizard.metrics:metrics-graphite:$metricsVersion"
+	compile "io.dropwizard.metrics:metrics-annotation:$metricsVersion"
+	compile "io.dropwizard.metrics:metrics-json:$metricsVersion"
+	compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+	compile "com.fasterxml.jackson.module:jackson-module-afterburner:$jacksonVersion"
+	compile "net.bytebuddy:byte-buddy:$byteBuddyVersion"
+	compile "net.bytebuddy:byte-buddy-agent:$byteBuddyVersion"
+	compile project(":stagemonitor-configuration")
+	provided "io.prometheus:simpleclient:0.0.14"
+	provided project(":stagemonitor-dispatcher")
+
+	testCompile "org.eclipse.jetty:jetty-server:$jettyVersion"
+	testCompile "org.elasticsearch:elasticsearch:$esVersion"
+	testCompile "org.elasticsearch.client:transport:$esVersion"
+}
+
+processResources {
+	from(project(':stagemonitor-dispatcher').jar) {
+		// gradle tries to be overly smart and extracts all resources which have the extension .jar
+		rename 'stagemonitor-dispatcher.*jar', 'stagemonitor-dispatcher.jar.gradlePleaseDontExtract'
+	}
+}

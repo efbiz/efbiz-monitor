@@ -1,0 +1,72 @@
+apply plugin: 'com.bmuschko.nexus'
+
+uploadArchives.dependsOn << compileJava
+install.dependsOn << compileJava
+
+task setIntegrationSnapshotVersion {
+	doLast {
+		project.version = "integration-SNAPSHOT"
+	}
+}
+install.mustRunAfter setIntegrationSnapshotVersion
+compileJava.mustRunAfter setIntegrationSnapshotVersion
+
+task installIntegrationSnapshot(dependsOn: [setIntegrationSnapshotVersion, install]) {}
+
+modifyPom {
+	project {
+		dependencies {
+			def configurations = project.configurations
+			(configurations.compile.allDependencies -
+					configurations.provided.allDependencies -
+					configurations.optional.allDependencies).each { dep ->
+				dependency {
+					groupId dep.group
+					artifactId dep.name
+					version dep.version
+					scope 'compile'
+				}
+			}
+			configurations.provided.allDependencies.each { dep ->
+				dependency {
+					groupId dep.group
+					artifactId dep.name
+					version dep.version
+					scope 'provided'
+				}
+			}
+		}
+		name "${project.group}:${project.name}"
+		description "an open source solution to application performance monitoring for java server applications"
+		url "http://www.stagemonitor.org"
+		organization {
+			name "iSYS Software GmbH"
+			url "https://www.isys-software.de/"
+		}
+		licenses {
+			license {
+				name 'The Apache Software License, Version 2.0'
+				url 'http://www.apache.org/license/LICENSE-2.0.txt'
+				distribution 'repo'
+			}
+		}
+		scm {
+			url "https://github.com/stagemonitor/stagemonitor"
+			connection "scm:git:git://github.com/stagemonitor/stagemonitor"
+			developerConnection "scm:git:git://github.com/stagemonitor/stagemonitor"
+		}
+		issueManagement {
+			system "GitHub Issues"
+			url "https://github.com/stagemonitor/stagemonitor/issues"
+		}
+		developers {
+			developer {
+				id 'felixbarny'
+				name 'Felix Barnsteiner'
+				email 'f.barnsteiner@isys-software.de'
+				organization 'iSYS Software GmbH'
+				organizationUrl "https://www.isys-software.de/"
+			}
+		}
+	}
+}
