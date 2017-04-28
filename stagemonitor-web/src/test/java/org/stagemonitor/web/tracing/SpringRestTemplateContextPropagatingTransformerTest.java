@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.mock.http.client.MockClientHttpRequest;
@@ -13,14 +14,11 @@ import org.stagemonitor.tracing.B3HeaderFormat;
 import org.stagemonitor.tracing.TracingPlugin;
 import org.stagemonitor.tracing.tracing.B3Propagator;
 import org.stagemonitor.web.tracing.SpringRestTemplateContextPropagatingTransformer.SpringRestTemplateContextPropagatingInterceptor;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import io.opentracing.mock.MockTracer;
-
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
@@ -45,7 +43,7 @@ public class SpringRestTemplateContextPropagatingTransformerTest {
 		final List<RestTemplate> restTemplates = Arrays.asList(
 				new RestTemplate(),
 				new RestTemplate(new SimpleClientHttpRequestFactory()),
-				new RestTemplate(Collections.singletonList(new StringHttpMessageConverter())));
+				new RestTemplate((ClientHttpRequestFactory) Collections.singletonList(new StringHttpMessageConverter())));
 		for (RestTemplate restTemplate : restTemplates) {
 			assertThat(restTemplate.getInterceptors().size(), is(1));
 			assertThat(restTemplate.getInterceptors(), hasItem(isA(SpringRestTemplateContextPropagatingInterceptor.class)));
